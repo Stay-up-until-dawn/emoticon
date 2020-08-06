@@ -1,0 +1,44 @@
+import requests
+import parsel
+import os
+
+
+
+
+image_dir = 'images'
+
+
+for i in range(1,201):
+    print(f'================正在爬取第{i}页================')
+    #请求数据
+    response = requests.get(f'https://www.fabiaoqing.com/biaoqing/lists/page/{i}.html')
+
+    #处理数据
+    sel = parsel.Selector(response.text)
+
+    imgs = sel.css('.ui.segment img')
+
+
+    for img in imgs:
+        image_url = img.xpath('./@data-original').get()
+        image_name = img.xpath('./@title').get()
+
+
+        '''准备文件后缀名'''
+        response = requests.get(image_url)
+        suffix = image_url.split('.')[-1]
+
+
+
+        try:
+            with open(image_dir + '/' + image_name + '.' + suffix,  mode = 'wb') as f:
+                print('下载完成：', image_name)
+                f.write(response.content)
+
+
+        except:
+
+            pass
+
+
+
