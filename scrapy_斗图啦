@@ -1,0 +1,55 @@
+import requests
+import parsel
+import time
+import os
+
+
+
+if not os.path.exists('image'):
+    os.mkdir('image')
+
+
+
+
+
+a = 999999999
+b = a +1
+for page in range(1,b):
+
+    print("===================/正在爬取第{}页/===================".format(page))
+    base_url = 'https://www.doutula.com/photo/list/?page={}'.format(page)
+    headers = {'user-agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'}
+
+    response = requests.get(url = base_url, headers = headers)
+
+    html_data = response.text
+
+
+    selector = parsel.Selector(html_data)
+
+
+    result_list = selector.xpath('//a[@class="col-xs-6 col-sm-3"]')
+
+    if page>2:
+        time.sleep(10)
+        print('休眠中')
+
+   
+
+    for result in result_list:
+        img_url = result.xpath('./img/@data-original').extract_first()
+        img_title = result.xpath('./img/@alt').extract_first()
+
+        all_title = img_title  + '.' + img_url.split('.')[-1]
+
+        img_data = requests.get(url = img_url,headers = headers).content
+
+        
+        #保存文件
+        try:
+            with open('image\\' + all_title, mode = 'wb') as f:
+                print('保存完成:', all_title)
+                f.write(img_data)
+
+        except:
+            pass
